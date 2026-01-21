@@ -1,0 +1,10 @@
+region       = "us-east-1"
+name_prefix  = "careflow"
+vpc_cidr     = "10.20.0.0/16"
+subnet_cidr  = "10.20.1.0/24"
+instance_type = "t2.micro"
+
+tags = {
+  project = "careflow"
+  env     = "dev"
+}
