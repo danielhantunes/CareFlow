@@ -1,0 +1,30 @@
+name: Terraform Bootstrap (Manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::767397900909:role/gh-actions-terraform
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init (bootstrap)
+        run: terraform -chdir=terraform/bootstrap init
+
+      - name: Terraform Apply (bootstrap)
+        run: terraform -chdir=terraform/bootstrap apply -auto-approve
