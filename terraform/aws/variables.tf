@@ -31,8 +31,15 @@ variable "instance_type" {
 variable "tags" {
   type        = map(string)
   description = "Common resource tags"
+
   default = {
     project = "careflow"
     env     = "dev"
   }
+
+  validation {
+    condition     = contains(keys(var.tags), "project")
+    error_message = "The 'project' tag is required (e.g. project = \"careflow\")."
+  }
 }
+
