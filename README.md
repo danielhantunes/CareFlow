@@ -1,39 +1,50 @@
+## Project Status
+🚧 This project is under active development.
+
+This repository demonstrates end-to-end data engineering and cloud infrastructure concepts,
+with a focus on secure, cloud-native architectures using Infrastructure as Code (Terraform).
+New features, architectural improvements, and documentation are continuously added as the
+project evolves.
+
+---
+
 # CareFlow Infrastructure
 
-This repository contains Terraform configurations for infrastructure provisioning.
+CareFlow is a multi-cloud infrastructure project designed to showcase best practices for
+provisioning secure, private, and scalable environments that support data engineering workloads.
 
-## AWS (Private VPC + EC2)
+The project focuses on:
+- Private networking by default
+- Infrastructure as Code (Terraform)
+- Secure access patterns (no SSH, no public IPs)
+- Cloud-agnostic architectural principles (AWS and GCP)
 
-Location: `terraform/aws`
+---
 
-### What gets created
+## AWS — Private VPC with EC2 (SSM-only access)
+
+**Location:** `terraform/aws`
+
+### What is provisioned
 - 1 VPC with DNS support enabled
 - 1 private subnet (no public IPs)
-- Private EC2 instance (`t2.micro`) with IMDSv2 required
-- Security groups with no inbound access to the instance
+- 1 private EC2 instance (`t2.micro`) with IMDSv2 enforced
+- Security groups with no inbound access
 - Interface VPC endpoints for AWS Systems Manager (SSM)
-- IAM role and instance profile for SSM access
+- IAM role and instance profile for secure SSM access
+
+### Design principles
+- Instances are **not exposed to the internet**
+- No SSH access; all connectivity is handled via **AWS Systems Manager**
+- Designed for running batch jobs, agents, or internal data workloads
 
 ### Prerequisites
 - Terraform >= 1.5
-- AWS credentials configured (e.g. `aws configure` or environment variables)
-- Permission to create VPC, EC2, IAM, and VPC endpoints
+- AWS credentials configured (via `aws configure` or environment variables)
+- Permissions to create VPC, EC2, IAM, and VPC endpoints
 
 ### Usage
 1. Copy the example variables file:
-   - `copy terraform/aws/terraform.tfvars.example terraform/aws/terraform.tfvars`
-2. Initialize and apply:
-   - `cd terraform/aws`
-   - `terraform init`
-   - `terraform apply`
+   ```bash
+   copy terraform/aws/terraform.tfvars.example terraform/aws/terraform.tfvars
 
-### Notes
-- The subnet is private-only and has no internet access.
-- Use Session Manager to access the instance:
-  - `aws ssm start-session --target <instance-id>`
-
-## GCP
-
-Location: `terraform/gcp`
-
-Contains a private VPC, subnet, Cloud NAT, and a private VM (see directory for details).
