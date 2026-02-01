@@ -1,22 +1,19 @@
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 }
 
 resource "aws_s3_bucket" "tf_state" {
-  bucket = "careflow-terraform-state-767397900909"
+  bucket = var.state_bucket_name
 
   versioning {
     enabled = true
   }
 
-  tags = {
-    project    = "careflow"
-    managed_by = "terraform"
-  }
+  tags = var.tags
 }
 
 resource "aws_dynamodb_table" "tf_locks" {
-  name         = "terraform-state-locks"
+  name         = var.lock_table_name
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
@@ -25,8 +22,5 @@ resource "aws_dynamodb_table" "tf_locks" {
     type = "S"
   }
 
-  tags = {
-    project    = "careflow"
-    managed_by = "terraform"
-  }
+  tags = var.tags
 }

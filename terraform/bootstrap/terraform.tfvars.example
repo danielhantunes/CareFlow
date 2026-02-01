@@ -1,0 +1,8 @@
+aws_region       = "us-east-1"
+state_bucket_name = "careflow-terraform-state-123456789012"
+lock_table_name  = "terraform-state-locks"
+
+tags = {
+  project    = "careflow"
+  managed_by = "terraform"
+}

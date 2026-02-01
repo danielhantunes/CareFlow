@@ -100,6 +100,10 @@ Workflows:
 - `terraform-bootstrap.yml` for bootstrap initialization
 - `terraform-infra.yml` for main infrastructure plans/applies
 
+Required GitHub Actions variables:
+- `AWS_ROLE_ARN` (OIDC role to assume)
+- `AWS_REGION` (target AWS region)
+
 ---
 
 ## CI/CD Authentication with OIDC
