@@ -102,19 +102,22 @@ Workflows:
 
 ---
 
-## CI/CD and OIDC (best practice)
+## CI/CD Authentication with OIDC
 
-This project uses GitHub Actions with Terraform and AWS OIDC to avoid long-lived cloud keys.
-The workflow requests short-lived credentials by assuming an IAM role at runtime, which is a
-common and recommended pattern for production data platforms.
+CareFlow uses GitHub Actions with AWS OpenID Connect (OIDC) to authenticate
+Terraform workflows without long-lived AWS credentials.
 
-Benefits:
-- No static secrets in CI
-- Least-privilege, short-lived credentials
-- Auditable, centralized IAM policy control
+An IAM OIDC identity provider is configured in the AWS account to trust
+`token.actions.githubusercontent.com`. GitHub Actions then assumes the
+`gh-actions-terraform` role at runtime using short-lived credentials via
+`sts:AssumeRoleWithWebIdentity`.
 
-This pattern mirrors how modern production data platforms handle CI/CD authentication in
-regulated or security-conscious environments.
+This approach:
+- Eliminates static AWS access keys in CI/CD
+- Uses short-lived, auditable credentials
+- Reflects modern production security practices for data platforms
+
+An active AWS account is required to configure the OIDC provider and IAM role.
 
 ---
 
