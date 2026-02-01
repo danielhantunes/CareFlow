@@ -1,22 +1,28 @@
 ## Project Status
-🚧 This project is under active development.
+🚧 This project is under active development and continuously evolving.
+The current state already reflects production-oriented design decisions.
 
 CareFlow demonstrates end-to-end data engineering infrastructure patterns with a focus on
 secure, private, cloud-native architectures using Terraform. The repository is structured
 to support multi-cloud deployments and repeatable environments.
 
+⚠️ This project provisions real cloud resources and may incur costs.
+Review the Terraform plan carefully before applying.
+
 ---
 
 # CareFlow Infrastructure
 
-CareFlow is a multi-cloud infrastructure project designed to showcase best practices for
-provisioning secure, private, and scalable environments that support data engineering workloads.
+CareFlow demonstrates how modern data platforms can be built on top of secure, private
+infrastructure foundations, emphasizing reproducibility, cloud neutrality, and security-first
+access patterns.
 
 Key principles:
-- Private networking by default
+- Private networking by default (zero-trust mindset)
 - Infrastructure as Code (Terraform)
 - Secure access patterns (no SSH, no public IPs)
 - Cloud-agnostic architectural principles (AWS and GCP)
+- Designed for extensibility toward data engineering workloads
 
 ---
 
@@ -74,7 +80,8 @@ What is provisioned:
 Design principles:
 - Instances are not exposed to the internet
 - No SSH access; connectivity is via AWS Systems Manager
-- Suitable for internal batch/data workloads
+- Suitable for internal batch, ETL, or data processing workloads where
+  network isolation and controlled access are required
 
 ### GCP — Private networking baseline
 **Location:** `terraform/gcp`
@@ -92,6 +99,22 @@ What is provisioned:
 Workflows:
 - `terraform-bootstrap.yml` for bootstrap initialization
 - `terraform-infra.yml` for main infrastructure plans/applies
+
+---
+
+## CI/CD and OIDC (best practice)
+
+This project uses GitHub Actions with Terraform and AWS OIDC to avoid long-lived cloud keys.
+The workflow requests short-lived credentials by assuming an IAM role at runtime, which is a
+common and recommended pattern for production data platforms.
+
+Benefits:
+- No static secrets in CI
+- Least-privilege, short-lived credentials
+- Auditable, centralized IAM policy control
+
+This pattern mirrors how modern production data platforms handle CI/CD authentication in
+regulated or security-conscious environments.
 
 ---
 
