@@ -42,6 +42,14 @@ terraform/
     terraform.tfvars.example
     variables.tf
     versions.tf
+  azure/
+    backend.tf
+    main.tf
+    outputs.tf
+    providers.tf
+    terraform.tfvars.example
+    variables.tf
+    versions.tf
   bootstrap/
     main.tf
     variables.tf
@@ -89,6 +97,12 @@ Design principles:
 What is provisioned:
 - Private networking primitives and outputs for downstream workloads
 - GCP-specific provider and version pinning
+
+### Azure — Placeholder module
+**Location:** `terraform/azure`
+
+What is provisioned:
+- Placeholder files for future Azure infrastructure
 
 ---
 
