@@ -6,6 +6,8 @@ on:
 jobs:
   bootstrap:
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_state_bucket_name: ${{ vars.STATE_BUCKET_NAME }}
 
     permissions:
       id-token: write
@@ -30,7 +32,7 @@ jobs:
         run: terraform -chdir=terraform/bootstrap validate
 
       - name: Terraform Plan (bootstrap)
-        run: terraform -chdir=terraform/bootstrap plan
+        run: terraform -chdir=terraform/bootstrap plan -input=false
 
       - name: Terraform Apply (bootstrap)
-        run: terraform -chdir=terraform/bootstrap apply -auto-approve
+        run: terraform -chdir=terraform/bootstrap apply -auto-approve -input=false

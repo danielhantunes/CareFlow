@@ -47,14 +47,14 @@ jobs:
       - name: Terraform Plan
         if: inputs.action == 'plan'
         working-directory: terraform/aws
-        run: terraform plan
+        run: terraform plan -input=false
 
       - name: Terraform Apply
         if: inputs.action == 'apply'
         working-directory: terraform/aws
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -input=false
 
       - name: Terraform Destroy
         if: inputs.action == 'destroy'
         working-directory: terraform/aws
-        run: terraform destroy -auto-approve
+        run: terraform destroy -auto-approve -input=false
