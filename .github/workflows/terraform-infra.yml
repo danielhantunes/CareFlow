@@ -38,7 +38,11 @@ jobs:
 
       - name: Terraform Init
         working-directory: terraform/aws
-        run: terraform init
+        run: >-
+          terraform init
+          -backend-config="bucket=${{ vars.STATE_BUCKET_NAME }}"
+          -backend-config="dynamodb_table=${{ vars.LOCK_TABLE_NAME || 'terraform-state-locks' }}"
+          -backend-config="region=${{ vars.AWS_REGION || 'us-east-1' }}"
 
       - name: Terraform Validate
         working-directory: terraform/aws

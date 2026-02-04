@@ -18,6 +18,7 @@ jobs:
 
     env:
       TF_VAR_state_bucket_name: ${{ vars.STATE_BUCKET_NAME }}
+      TF_VAR_lock_table_name: ${{ vars.LOCK_TABLE_NAME || 'terraform-state-locks' }}
 
     permissions:
       id-token: write
