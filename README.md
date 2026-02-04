@@ -116,7 +116,16 @@ Workflows:
 
 Required GitHub Actions variables:
 - `AWS_ROLE_ARN` (OIDC role to assume)
-- `AWS_REGION` (target AWS region)
+- `STATE_BUCKET_NAME` (S3 bucket for Terraform remote state)
+
+Optional GitHub Actions variables:
+- `AWS_REGION` (target AWS region, default: `us-east-1`)
+- `LOCK_TABLE_NAME` (DynamoDB table for state locking, default: `terraform-state-locks`)
+
+Bootstrap and infra workflow order:
+- Run `terraform-bootstrap.yml` with `terraform_action=apply` to create the S3 bucket and lock table
+- Run `terraform-infra.yml` with `action=apply` to create infrastructure state in S3
+- Run `terraform-infra.yml` with `action=destroy` to tear down infrastructure
 
 ---
 
