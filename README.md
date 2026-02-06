@@ -129,6 +129,20 @@ Bootstrap and infra workflow order:
 
 ---
 
+## Remote State Design
+
+CareFlow uses:
+- S3 for Terraform state storage
+- DynamoDB for state locking
+
+Why both are required:
+- S3 stores Terraform's memory (resource IDs and dependencies)
+- DynamoDB prevents concurrent runs from corrupting state
+
+This is the standard production pattern used in AWS environments.
+
+---
+
 ## CI/CD Authentication with OIDC
 
 CareFlow uses GitHub Actions with AWS OpenID Connect (OIDC) to authenticate
@@ -139,11 +153,13 @@ An IAM OIDC identity provider is configured in the AWS account to trust
 `gh-actions-terraform` role at runtime using short-lived credentials via
 `sts:AssumeRoleWithWebIdentity`.
 
-This approach:
-- Eliminates static AWS access keys in CI/CD
-- Uses short-lived, auditable credentials
-- Reflects modern production security practices for data platforms
+Benefits:
+- No long-lived AWS keys
+- Short-lived credentials
+- Auditable access
+- Least privilege
 
+This approach reflects modern production security practices for data platforms.
 An active AWS account is required to configure the OIDC provider and IAM role.
 
 ---
