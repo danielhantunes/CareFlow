@@ -137,6 +137,17 @@ Optional GitHub Actions variables:
 - `GCP_STATE_PREFIX` (GCS state prefix, default: `gcp/dev/terraform.tfstate`)
 - `GCP_STATE_LOCATION` (GCS bucket location, default: `US`)
 
+Set these as GitHub Actions variables under Settings → Secrets and variables → Actions → Variables.
+
+Safe to publish:
+- Document variable names, not real values
+- Use placeholders in public docs, for example:
+  - `AWS_ROLE_ARN=arn:aws:iam::<account-id>:role/<role-name>`
+  - `STATE_BUCKET_NAME=<aws-state-bucket>`
+  - `GCP_WORKLOAD_IDENTITY_PROVIDER=projects/<project-number>/locations/global/workloadIdentityPools/<pool>/providers/<provider>`
+  - `GCP_SERVICE_ACCOUNT=<sa-name>@<project-id>.iam.gserviceaccount.com`
+  - `GCP_STATE_BUCKET=<gcp-state-bucket>`
+
 Bootstrap and infra workflow order:
 - Run `terraform-bootstrap-aws.yml` with `terraform_action=apply` to create the S3 bucket and lock table
 - Run `terraform-bootstrap-gcp.yml` with `terraform_action=apply` to create the GCS bucket
