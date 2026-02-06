@@ -31,8 +31,10 @@ Key principles:
 ```
 .github/
   workflows/
-    terraform-bootstrap.yml
-    terraform-infra.yml
+    terraform-bootstrap-aws.yml
+    terraform-bootstrap-gcp.yml
+    terraform-infra-aws.yml
+    terraform-infra-gcp.yml
 terraform/
   aws/
     backend.tf
@@ -51,6 +53,9 @@ terraform/
     variables.tf
     versions.tf
   bootstrap/
+    main.tf
+    variables.tf
+  bootstrap-gcp/
     main.tf
     variables.tf
   gcp/
@@ -111,31 +116,44 @@ What is provisioned:
 **Location:** `.github/workflows`
 
 Workflows:
-- `terraform-bootstrap.yml` for bootstrap initialization
-- `terraform-infra.yml` for main infrastructure plans/applies
+- `terraform-bootstrap-aws.yml` for AWS bootstrap initialization
+- `terraform-bootstrap-gcp.yml` for GCP bootstrap initialization
+- `terraform-infra-aws.yml` for AWS infrastructure plans/applies
+- `terraform-infra-gcp.yml` for GCP infrastructure plans/applies
 
-Required GitHub Actions variables:
+Required GitHub Actions variables (AWS):
 - `AWS_ROLE_ARN` (OIDC role to assume)
 - `STATE_BUCKET_NAME` (S3 bucket for Terraform remote state)
+
+Required GitHub Actions variables (GCP):
+- `GCP_WORKLOAD_IDENTITY_PROVIDER` (Workload Identity Provider resource)
+- `GCP_SERVICE_ACCOUNT` (Service account email to impersonate)
+- `GCP_STATE_BUCKET` (GCS bucket for Terraform remote state)
 
 Optional GitHub Actions variables:
 - `AWS_REGION` (target AWS region, default: `us-east-1`)
 - `LOCK_TABLE_NAME` (DynamoDB table for state locking, default: `terraform-state-locks`)
+- `GCP_PROJECT_ID` (target GCP project id)
+- `GCP_STATE_PREFIX` (GCS state prefix, default: `gcp/dev/terraform.tfstate`)
+- `GCP_STATE_LOCATION` (GCS bucket location, default: `US`)
 
 Bootstrap and infra workflow order:
-- Run `terraform-bootstrap.yml` with `terraform_action=apply` to create the S3 bucket and lock table
-- Run `terraform-infra.yml` with `action=apply` to create infrastructure state in S3
-- Run `terraform-infra.yml` with `action=destroy` to tear down infrastructure
+- Run `terraform-bootstrap-aws.yml` with `terraform_action=apply` to create the S3 bucket and lock table
+- Run `terraform-bootstrap-gcp.yml` with `terraform_action=apply` to create the GCS bucket
+- Run `terraform-infra-aws.yml` with `action=apply` to create infrastructure state in S3
+- Run `terraform-infra-aws.yml` with `action=destroy` to tear down AWS infrastructure
+- Run `terraform-infra-gcp.yml` with `action=apply` to create infrastructure state in GCS
+- Run `terraform-infra-gcp.yml` with `action=destroy` to tear down GCP infrastructure
 
 ---
 
 ## Remote State Design
 
 CareFlow uses:
-- S3 for Terraform state storage
-- DynamoDB for state locking
+- AWS: S3 for Terraform state storage and DynamoDB for state locking
+- GCP: GCS for Terraform state storage
 
-Why both are required:
+Why AWS uses both:
 - S3 stores Terraform's memory (resource IDs and dependencies)
 - DynamoDB prevents concurrent runs from corrupting state
 

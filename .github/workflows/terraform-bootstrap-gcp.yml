@@ -1,0 +1,53 @@
+name: Terraform Bootstrap (GCP)
+
+on:
+  workflow_dispatch:
+    inputs:
+      terraform_action:
+        description: "Terraform action to run"
+        required: true
+        default: plan
+        type: choice
+        options:
+          - plan
+          - apply
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_state_bucket_name: ${{ vars.GCP_STATE_BUCKET }}
+      TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID || 'woltrix-careflow-platform' }}
+      TF_VAR_location: ${{ vars.GCP_STATE_LOCATION || 'US' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud via OIDC
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ vars.GCP_PROJECT_ID || 'woltrix-careflow-platform' }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init (bootstrap)
+        run: terraform -chdir=terraform/bootstrap-gcp init
+
+      - name: Terraform Validate (bootstrap)
+        run: terraform -chdir=terraform/bootstrap-gcp validate
+
+      - name: Terraform Plan (bootstrap)
+        if: ${{ github.event.inputs.terraform_action == 'plan' }}
+        run: terraform -chdir=terraform/bootstrap-gcp plan -input=false -no-color
+
+      - name: Terraform Apply (bootstrap)
+        if: ${{ github.event.inputs.terraform_action == 'apply' }}
+        run: terraform -chdir=terraform/bootstrap-gcp apply -auto-approve -input=false -no-color

@@ -1,4 +1,4 @@
-name: Terraform Bootstrap (Manual)
+name: Terraform Bootstrap (AWS)
 
 on:
   workflow_dispatch:
