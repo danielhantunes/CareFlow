@@ -45,7 +45,6 @@ terraform/
     variables.tf
     versions.tf
   azure/
-    backend.tf
     main.tf
     outputs.tf
     providers.tf
@@ -54,11 +53,16 @@ terraform/
     versions.tf
   bootstrap/
     main.tf
+    outputs.tf
+    terraform.tfvars.example
     variables.tf
   bootstrap-gcp/
     main.tf
+    outputs.tf
+    terraform.tfvars.example
     variables.tf
   gcp/
+    backend.tf
     main.tf
     outputs.tf
     providers.tf
@@ -73,7 +77,9 @@ README.md
 ## Terraform Modules
 
 ### Bootstrap (remote state baseline)
-**Location:** `terraform/bootstrap`
+**Locations:**
+- AWS: `terraform/bootstrap`
+- GCP: `terraform/bootstrap-gcp`
 
 Purpose:
 - Baseline resources needed for Terraform state management
