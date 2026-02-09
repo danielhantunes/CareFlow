@@ -212,6 +212,7 @@ An active AWS account is required to configure the OIDC provider and IAM role.
 Default regions:
 - AWS: `us-east-1` (broad service coverage and competitive pricing)
 - GCP: `us-central1` (broad service coverage and competitive pricing)
+ - GCP bootstrap state bucket: `us-central1`
 
 These choices are generally cost-effective for development workloads. Cost is a valid reason to pick a
 default region, but it is not the only one. When choosing a region, also consider:

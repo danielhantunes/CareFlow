@@ -12,7 +12,7 @@ variable "state_bucket_name" {
 variable "location" {
   type        = string
   description = "GCS bucket location"
-  default     = "US"
+  default     = "us-central1"
 }
 
 variable "labels" {

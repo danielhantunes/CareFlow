@@ -12,10 +12,6 @@ on:
           - plan
           - apply
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   bootstrap:
     runs-on: ubuntu-latest
@@ -23,7 +19,11 @@ jobs:
     env:
       TF_VAR_state_bucket_name: ${{ vars.GCP_STATE_BUCKET }}
       TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID || 'woltrix-careflow-platform' }}
-      TF_VAR_location: ${{ vars.GCP_STATE_LOCATION || 'US' }}
+      TF_VAR_location: ${{ vars.GCP_STATE_LOCATION || 'us-central1' }}
+
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
