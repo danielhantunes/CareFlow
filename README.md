@@ -61,6 +61,13 @@ terraform/
     outputs.tf
     terraform.tfvars.example
     variables.tf
+  connectivity-aws-gcp/
+    backend.tf
+    main.tf
+    outputs.tf
+    terraform.tfvars.example
+    variables.tf
+    versions.tf
   gcp/
     backend.tf
     main.tf
@@ -114,6 +121,20 @@ What is provisioned:
 
 What is provisioned:
 - Placeholder files for future Azure infrastructure
+
+### AWS ↔ GCP Connectivity (site-to-site VPN)
+**Location:** `terraform/connectivity-aws-gcp`
+
+What is provisioned:
+- AWS VPN gateway, customer gateway, VPN connection, and routes
+- GCP classic VPN gateway, forwarding rules, VPN tunnel, and route
+- ICMP allow rules for cross-cloud ping testing
+
+Design notes:
+- Uses Terraform remote state outputs from `terraform/aws` and `terraform/gcp`
+- Intended for short-term AWS↔GCP connectivity validation and testing
+ - The initial implementation uses a static site-to-site VPN between AWS and GCP to validate cross-cloud private connectivity and support early pipeline experimentation.
+ - As the platform evolves and additional clouds are introduced, this connectivity layer is designed to transition to HA VPN with BGP-based dynamic routing to provide resilient, scalable multicloud networking.
 
 ---
 

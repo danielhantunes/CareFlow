@@ -1,0 +1,96 @@
+name: Terraform Connectivity (AWS-GCP VPN)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform action"
+        required: true
+        default: "plan"
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_aws_state_bucket: ${{ vars.STATE_BUCKET_NAME }}
+      TF_VAR_aws_state_region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      TF_VAR_gcp_state_bucket: ${{ vars.GCP_STATE_BUCKET }}
+      TF_VAR_gcp_state_prefix: ${{ vars.GCP_STATE_PREFIX || 'gcp/dev' }}
+      TF_VAR_aws_region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      TF_VAR_gcp_region: ${{ vars.GCP_REGION || 'us-central1' }}
+      TF_VAR_gcp_project_id: ${{ vars.GCP_PROJECT_ID || 'woltrix-careflow-platform' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Authenticate to Google Cloud via OIDC
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ vars.GCP_PROJECT_ID || 'woltrix-careflow-platform' }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Check AWS remote state exists
+        run: >-
+          aws s3api head-object
+          --bucket "${{ vars.STATE_BUCKET_NAME }}"
+          --key "${{ vars.AWS_STATE_KEY || 'aws/dev/terraform.tfstate' }}"
+          || (echo "Missing AWS state file: s3://${{ vars.STATE_BUCKET_NAME }}/${{ vars.AWS_STATE_KEY || 'aws/dev/terraform.tfstate' }}. Run the AWS infra workflow first." && exit 1)
+
+      - name: Check GCP remote state exists
+        run: >-
+          gcloud storage objects describe
+          "gs://${{ vars.GCP_STATE_BUCKET }}/${{ vars.GCP_STATE_PREFIX || 'gcp/dev' }}/terraform.tfstate"
+          || (echo "Missing GCP state file: gs://${{ vars.GCP_STATE_BUCKET }}/${{ vars.GCP_STATE_PREFIX || 'gcp/dev' }}/terraform.tfstate. Run the GCP infra workflow first." && exit 1)
+
+      - name: Terraform Init
+        working-directory: terraform/connectivity-aws-gcp
+        run: >-
+          terraform init
+          -backend-config="bucket=${{ vars.STATE_BUCKET_NAME }}"
+          -backend-config="dynamodb_table=${{ vars.LOCK_TABLE_NAME || 'terraform-state-locks' }}"
+          -backend-config="region=${{ vars.AWS_REGION || 'us-east-1' }}"
+
+      - name: Terraform Validate
+        working-directory: terraform/connectivity-aws-gcp
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: inputs.action == 'plan'
+        working-directory: terraform/connectivity-aws-gcp
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: inputs.action == 'apply'
+        working-directory: terraform/connectivity-aws-gcp
+        run: terraform apply -auto-approve -input=false
+
+      - name: Terraform Destroy
+        if: inputs.action == 'destroy'
+        working-directory: terraform/connectivity-aws-gcp
+        run: terraform destroy -auto-approve -input=false

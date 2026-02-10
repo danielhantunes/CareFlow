@@ -1,0 +1,10 @@
+aws_state_bucket = "<aws-state-bucket>"
+gcp_state_bucket = "<gcp-state-bucket>"
+
+# Optional overrides
+# aws_state_region = "us-east-1"
+# aws_state_key    = "aws/dev/terraform.tfstate"
+# gcp_state_prefix = "gcp/dev"
+# aws_region       = "us-east-1"
+# gcp_region       = "us-central1"
+# vpn_shared_secret = "<optional-pre-shared-key>"
