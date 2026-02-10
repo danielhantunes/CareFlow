@@ -26,6 +26,19 @@ Key principles:
 
 ---
 
+## Architecture Modules (planned)
+
+CareFlow will evolve into reusable architecture blueprints organized by module type:
+
+- Foundation modules: core networking, security, state, and observability primitives
+- Platform modules: data ingestion, storage tiers, orchestration, and governance
+- Domain modules: healthcare datasets, schema standards, and de-identification patterns
+
+This structure supports consistent, repeatable deployments across clouds while keeping
+domain-specific logic separate from core infrastructure.
+
+---
+
 ## Repository Structure
 
 ```
