@@ -133,8 +133,8 @@ What is provisioned:
 Design notes:
 - Uses Terraform remote state outputs from `terraform/aws` and `terraform/gcp`
 - Intended for short-term AWS↔GCP connectivity validation and testing
- - The initial implementation uses a static site-to-site VPN between AWS and GCP to validate cross-cloud private connectivity and support early pipeline experimentation.
- - As the platform evolves and additional clouds are introduced, this connectivity layer is designed to transition to HA VPN with BGP-based dynamic routing to provide resilient, scalable multicloud networking.
+- The initial implementation uses a static site-to-site VPN between AWS and GCP to validate cross-cloud private connectivity and support early pipeline experimentation.
+- As the platform evolves and additional clouds are introduced, this connectivity layer is designed to transition to HA VPN with BGP-based dynamic routing to provide resilient, scalable multicloud networking.
 
 ---
 
@@ -147,6 +147,7 @@ Workflows:
 - `terraform-bootstrap-gcp.yml` for GCP bootstrap initialization
 - `terraform-infra-aws.yml` for AWS infrastructure plans/applies
 - `terraform-infra-gcp.yml` for GCP infrastructure plans/applies
+- `terraform-connectivity-aws-gcp.yml` for AWS↔GCP VPN connectivity plans/applies
 
 Required GitHub Actions variables (AWS):
 - `AWS_ROLE_ARN` (OIDC role to assume)
@@ -158,11 +159,14 @@ Required GitHub Actions variables (GCP):
 - `GCP_STATE_BUCKET` (GCS bucket for Terraform remote state)
 
 Optional GitHub Actions variables:
-- `AWS_REGION` (target AWS region, default: `us-east-1`)
+
 - `LOCK_TABLE_NAME` (DynamoDB table for state locking, default: `terraform-state-locks`)
+- `AWS_REGION` (target AWS region, default: `us-east-1`)
+- `AWS_STATE_KEY` (S3 state key for AWS infra, default: `aws/dev/terraform.tfstate`)
 - `GCP_PROJECT_ID` (target GCP project id)
-- `GCP_STATE_PREFIX` (GCS state prefix, default: `gcp/dev/terraform.tfstate`)
-- `GCP_STATE_LOCATION` (GCS bucket location, default: `US`)
+- `GCP_REGION` (target GCP region, default: `us-central1`)
+- `GCP_STATE_PREFIX` (GCS state prefix, default: `gcp/dev`)
+- `GCP_STATE_LOCATION` (GCS bucket location, default: `us-central1`)
 
 Set these as GitHub Actions variables under Settings → Secrets and variables → Actions → Variables.
 
@@ -182,6 +186,8 @@ Bootstrap and infra workflow order:
 - Run `terraform-infra-aws.yml` with `action=destroy` to tear down AWS infrastructure
 - Run `terraform-infra-gcp.yml` with `action=apply` to create infrastructure state in GCS
 - Run `terraform-infra-gcp.yml` with `action=destroy` to tear down GCP infrastructure
+- Run `terraform-connectivity-aws-gcp.yml` with `action=apply` to create the AWS↔GCP VPN once both infra states exist
+- Run `terraform-connectivity-aws-gcp.yml` with `action=destroy` to tear down AWS↔GCP VPN connectivity
 
 ---
 
