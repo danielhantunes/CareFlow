@@ -1,13 +1,9 @@
 ## Project Status
-🚧 This project is under active development and continuously evolving.
-The current state already reflects production-oriented design decisions.
+🚧 This project is currently in progress and actively evolving. While still under development, the existing implementation already reflects production-oriented architectural decisions.
 
-CareFlow demonstrates end-to-end data engineering infrastructure patterns with a focus on
-secure, private, cloud-native architectures using Terraform. The repository is structured
-to support multi-cloud deployments and repeatable environments.
+CareFlow demonstrates end-to-end data engineering infrastructure patterns with a focus on secure, private, cloud-native architectures using Terraform. The repository is structured to support multi-cloud deployments and repeatable environments.
 
-⚠️ This project provisions real cloud resources and may incur costs.
-Review the Terraform plan carefully before applying.
+⚠️ This project provisions real cloud resources and may incur costs. Review the Terraform plan carefully before applying.
 
 ---
 
